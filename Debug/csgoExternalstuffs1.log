@@ -1,0 +1,4 @@
+﻿  csgoExternalstuffs1.cpp
+C:\Users\Alastor\source\repos\csgoExternalstuffs1\csgoExternalstuffs1.cpp(55,29): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Alastor\source\repos\csgoExternalstuffs1\csgoExternalstuffs1.cpp(56,23): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
+  csgoExternalstuffs1.vcxproj -> C:\Users\Alastor\source\repos\csgoExternalstuffs1\Debug\csgoExternalstuffs1.exe

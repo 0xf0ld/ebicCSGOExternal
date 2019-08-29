@@ -1,0 +1,6 @@
+﻿  csgoExternalstuffs1.cpp
+  MemMan.cpp
+C:\Users\Alastor\source\repos\csgoExternalstuffs1\MemMan.cpp(24,6): error C2664:  'int strcmp(const char *,const char *)': cannot convert argument 1 from 'WCHAR [260]' to 'const char *'
+C:\Users\Alastor\source\repos\csgoExternalstuffs1\MemMan.cpp(24,21): message :  Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+C:\Users\Alastor\source\repos\csgoExternalstuffs1\MemMan.cpp(42,6): error C2664:  'int strcmp(const char *,const char *)': cannot convert argument 1 from 'WCHAR [256]' to 'const char *'
+C:\Users\Alastor\source\repos\csgoExternalstuffs1\MemMan.cpp(42,21): message :  Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
