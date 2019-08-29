@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <iostream>
+#include <cmath>
 #include <thread>
 #include "MemMan.h"
 #include "csgo.hpp"
@@ -22,11 +23,12 @@ struct offsets {
 	uintptr_t isDefusing = hazedumper::netvars::m_bIsDefusing;
 	uintptr_t flashDuration = hazedumper::netvars::m_flFlashDuration;
 	uintptr_t isSpotted = hazedumper::netvars::m_bSpotted;
+	uintptr_t vecOrigin = hazedumper::netvars::m_vecOrigin;
 }offset;
 
 struct values {
 	uintptr_t localPlayer, process, gameModule, glowObject;
-	int friendlyTeam;
+	int friendlyTeam, triggerDelay;
 	BYTE flag;
 }val;
 
@@ -40,6 +42,10 @@ struct glowStruct {
 	BYTE buffer2[5]; // 5 bytes
 	int glowStyle; // 4 bytes
 }Glow;
+
+struct vector {
+	float x, y, z;
+};
 
 glowStruct SetGlowColour(glowStruct Glow, uintptr_t entity) {
 	bool isDefusing = MemClass.readMem<bool>(entity + offset.isDefusing);
@@ -62,6 +68,14 @@ glowStruct SetGlowColour(glowStruct Glow, uintptr_t entity) {
 	Glow.renderWhenNotIncluded = false;
 
 	return Glow;
+}
+
+void getDistance(uintptr_t entity) {
+	vector myLoc = MemClass.readMem<vector>(val.localPlayer + offset.vecOrigin);
+	vector enemyLoc = MemClass.readMem<vector>(entity + offset.vecOrigin);
+
+	float distance = sqrt(pow(myLoc.x - enemyLoc.x, 2) + pow(myLoc.y - enemyLoc.y, 2) + pow(myLoc.z - enemyLoc.z, 2)) * 0.0254; // * 0.0254 converts to metres from Source units
+	val.triggerDelay = distance * 2.62;
 }
 
 void setEnemyGlow(uintptr_t entity, int glowIndex) {
@@ -107,8 +121,9 @@ void fire() {
 		return;
 	std::cout << "Firing" << std::endl;
 	isTriggerbotFiring = !isTriggerbotFiring;
+	Sleep(val.triggerDelay);
 	MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 5);
-	Sleep(22);
+	Sleep(20);
 	MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 4);
 	isTriggerbotFiring = !isTriggerbotFiring;
 }
@@ -119,8 +134,10 @@ bool checkTrigger() {
 		uintptr_t entity = MemClass.readMem<uintptr_t>(val.gameModule + offset.entityList + ((crosshair - 1) * 0x10));
 		int enemyTeam = MemClass.readMem<int>(entity + offset.team);
 		int enemyHealth = MemClass.readMem<int>(entity + offset.health);
-		if (enemyTeam != val.friendlyTeam && enemyHealth > 0)
+		if (enemyTeam != val.friendlyTeam && enemyHealth > 0) {	
+			getDistance(entity);
 			return true;
+		}
 		else
 			return false;
 	}
