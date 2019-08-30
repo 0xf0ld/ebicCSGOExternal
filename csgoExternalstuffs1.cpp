@@ -24,11 +24,14 @@ struct offsets {
 	uintptr_t flashDuration = hazedumper::netvars::m_flFlashDuration;
 	uintptr_t isSpotted = hazedumper::netvars::m_bSpotted;
 	uintptr_t vecOrigin = hazedumper::netvars::m_vecOrigin;
+	uintptr_t activeWeapon = hazedumper::netvars::m_hActiveWeapon;
+	uintptr_t itemDefIndex = hazedumper::netvars::m_iItemDefinitionIndex;
+	uintptr_t isScoped = hazedumper::netvars::m_bIsScoped;
 }offset;
 
 struct values {
 	uintptr_t localPlayer, process, gameModule, glowObject;
-	int friendlyTeam, triggerDelay;
+	int friendlyTeam, triggerDelay, currentWeaponID;
 	BYTE flag;
 }val;
 
@@ -70,12 +73,50 @@ glowStruct SetGlowColour(glowStruct Glow, uintptr_t entity) {
 	return Glow;
 }
 
-void getDistance(uintptr_t entity) {
+bool isScoped() {
+	return MemClass.readMem<bool>(val.localPlayer + offset.isScoped);
+}
+
+void setTriggerDelay(float distance) {
+	float delay;
+
+	switch (val.currentWeaponID)
+	{
+	case 262204: delay = 3.3; break; //M4A1-S (might be wrong)
+	case 61: delay = 3.3; break; //USP-S (might be wrong)
+	case 60: delay = 3.3; break; //M4A1-S (might be wrong)
+	case 7: delay = 3.3; break; //CV-47 (might be wrong)
+	case 40: delay = 0.2; break; //SSG 08
+	case 9: delay = 0.2; break; //AWP
+	case 4: delay = 3.3; break; //GLOCK
+	case 8: delay = 3.3; break; //AUG
+	case 2: delay = 3.3; break; //Dual Berettas
+	case 16: delay = 3.3; break; //M4A4 (might be wrong)
+	case 10: delay = 3.3; break; //Famas
+	case 39: delay = 3.3; break; //SG553
+	case 30: delay = 3.3; break; //Tec 9
+	case 34: delay = 3.3; break; //MP9
+	case 13: delay = 3.3; break; //Galil
+	case 38: delay = 3.3; break; //SCAR-20
+	case 11: delay = 3.3; break; //G38G1 (T auto)
+	default: delay = 0;
+	}
+	val.triggerDelay = delay * distance;
+	std::cout << val.triggerDelay << std::endl;
+}
+
+void getCurrentWeapon() {
+	int weapon = MemClass.readMem<int>(val.localPlayer + offset.activeWeapon);
+	int weaponEntity = MemClass.readMem<int>(val.gameModule + offset.entityList + ((weapon & 0xFFF) - 1) * 0x10); 
+	if (weaponEntity != NULL)
+		val.currentWeaponID = MemClass.readMem<int>(weaponEntity + offset.itemDefIndex);
+}
+
+float getDistance(uintptr_t entity) {
 	vector myLoc = MemClass.readMem<vector>(val.localPlayer + offset.vecOrigin);
 	vector enemyLoc = MemClass.readMem<vector>(entity + offset.vecOrigin);
 
-	float distance = sqrt(pow(myLoc.x - enemyLoc.x, 2) + pow(myLoc.y - enemyLoc.y, 2) + pow(myLoc.z - enemyLoc.z, 2)) * 0.0254; // * 0.0254 converts to metres from Source units
-	val.triggerDelay = distance * 2.62;
+	return sqrt(pow(myLoc.x - enemyLoc.x, 2) + pow(myLoc.y - enemyLoc.y, 2) + pow(myLoc.z - enemyLoc.z, 2)) * 0.0254; // * 0.0254 converts to metres from Source units
 }
 
 void setEnemyGlow(uintptr_t entity, int glowIndex) {
@@ -135,8 +176,15 @@ bool checkTrigger() {
 		int enemyTeam = MemClass.readMem<int>(entity + offset.team);
 		int enemyHealth = MemClass.readMem<int>(entity + offset.health);
 		if (enemyTeam != val.friendlyTeam && enemyHealth > 0) {	
-			getDistance(entity);
-			return true;
+			float distance = getDistance(entity);
+			std::thread getcurrentweapon(getCurrentWeapon);
+			getcurrentweapon.detach();
+
+			setTriggerDelay(distance);
+			if (val.currentWeaponID == 40 || val.currentWeaponID == 9) // check if using scout or AWP
+				return isScoped();
+			else
+				return true;
 		}
 		else
 			return false;
@@ -227,7 +275,7 @@ int main() {
 			Sleep(1);
 		}
 
-		if (GetAsyncKeyState(VK_F2) & 1)
+		if (GetAsyncKeyState(VK_F2) & 1) //Triggerbot toggle
 		{
 			val.friendlyTeam = MemClass.readMem<int>(val.localPlayer + offset.team);
 			canFire = !canFire;
@@ -238,7 +286,7 @@ int main() {
 			triggerbot.detach();
 		}
 
-		Sleep(2);
+		Sleep(1);
 
 	}
 
