@@ -52,8 +52,8 @@ struct vector {
 
 glowStruct SetGlowColour(glowStruct Glow, uintptr_t entity) {
 	bool isDefusing = MemClass.readMem<bool>(entity + offset.isDefusing);
-	int friendlyTeam = MemClass.readMem<int>(val.localPlayer + offset.team);
-	if (isDefusing && !friendlyTeam) {
+	//int friendlyTeam = MemClass.readMem<int>(val.localPlayer + offset.team);
+	if (isDefusing) {
 		Glow.red = 1.0f;
 		Glow.green = 1.0f;
 		Glow.blue = 1.0f;
