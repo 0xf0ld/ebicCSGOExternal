@@ -52,7 +52,8 @@ struct vector {
 
 glowStruct SetGlowColour(glowStruct Glow, uintptr_t entity) {
 	bool isDefusing = MemClass.readMem<bool>(entity + offset.isDefusing);
-	if (isDefusing) {
+	int friendlyTeam = MemClass.readMem<int>(val.localPlayer + offset.team);
+	if (isDefusing && !friendlyTeam) {
 		Glow.red = 1.0f;
 		Glow.green = 1.0f;
 		Glow.blue = 1.0f;
@@ -131,6 +132,8 @@ void setTeamGlow(uintptr_t entity, int glowIndex) {
 	glowStruct TeamGlow;
 	TeamGlow = MemClass.readMem<glowStruct>(val.glowObject + (glowIndex * 0x38));
 	TeamGlow.blue = 1.0f;
+	TeamGlow.red = 0.0f;
+	TeamGlow.green = 0.0f;
 	TeamGlow.alpha = 1.0f;
 	TeamGlow.renderWhenIncluded = true;
 	TeamGlow.renderWhenNotIncluded = false;
@@ -220,7 +223,6 @@ void noFlash() {
 	flashDuration = MemClass.readMem<int>(val.localPlayer + offset.flashDuration);
 	if (flashDuration > 0)
 		MemClass.writeMem<int>(val.localPlayer + offset.flashDuration, 0);
-	noFlashEnabled = !noFlashEnabled;
 }
 
 void alwaysRadar() {
@@ -233,7 +235,6 @@ void alwaysRadar() {
 		if (entity != NULL)
 			MemClass.writeMem<bool>(entity + offset.isSpotted, true);
 	}
-	isRadarEnabled = !isRadarEnabled;
 }
 
 int main() {
@@ -246,11 +247,10 @@ int main() {
 	if (val.localPlayer == NULL)
 		while (val.localPlayer == NULL)
 			val.localPlayer = MemClass.readMem<uintptr_t>(val.gameModule + offset.localPlayer);
-
+	std::cout << std::hex << val.localPlayer << " = LocalPlayer" << std::endl;
 	while (true)
 	{
 		val.flag = MemClass.readMem<BYTE>(val.localPlayer + offset.flags);
-
 		if (GetKeyState(VK_F9) & 1)
 		{
 			std::thread RADARHACK(alwaysRadar);
@@ -269,13 +269,19 @@ int main() {
 			ESP.detach();
 		}
 
-		if (GetAsyncKeyState(VK_SPACE) && val.flag & (1 << 0)) {
-			std::thread bhop(bunnyHop);
-			bhop.detach();
-			Sleep(1);
+		if (GetAsyncKeyState(VK_SPACE)) {
+			if (val.flag & (1 << 0)) {
+				std::thread bhop(bunnyHop);
+				bhop.detach();
+				Sleep(1);
+			}
+			else
+			{
+				MemClass.writeMem<uintptr_t>(val.gameModule + offset.fJump, 4);
+			}
 		}
 
-		if (GetAsyncKeyState(VK_F2) & 1) //Triggerbot toggle
+		if (GetAsyncKeyState(VK_F2) & 1)
 		{
 			val.friendlyTeam = MemClass.readMem<int>(val.localPlayer + offset.team);
 			canFire = !canFire;
@@ -285,10 +291,7 @@ int main() {
 			std::thread triggerbot(handleTriggerbot);
 			triggerbot.detach();
 		}
-
 		Sleep(1);
-
 	}
-
 	return 0;
 }
