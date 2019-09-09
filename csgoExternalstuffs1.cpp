@@ -33,7 +33,7 @@ int main() {
 		}
 
 		if (GetAsyncKeyState(VK_SPACE)) {
-			if (val.flag & (1 << 0)) {
+			if (val.flag & (IN_JUMP)) {
 				std::thread bhop(bunnyHop);
 				bhop.detach();
 				Sleep(1);
