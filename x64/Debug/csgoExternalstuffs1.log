@@ -1,6 +1,0 @@
-﻿  csgoExternalstuffs1.cpp
-C:\Users\Alastor\source\repos\Alastowor\ebicCSGOExternal\csgoExternalstuffs1.cpp(61,29): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Alastor\source\repos\Alastowor\ebicCSGOExternal\csgoExternalstuffs1.cpp(62,23): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Alastor\source\repos\Alastowor\ebicCSGOExternal\csgoExternalstuffs1.cpp(78,30): warning C4244:  '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\Alastor\source\repos\Alastowor\ebicCSGOExternal\csgoExternalstuffs1.cpp(197,11): warning C4244:  'initializing': conversion from 'uintptr_t' to 'int', possible loss of data
-  csgoExternalstuffs1.vcxproj -> C:\Users\Alastor\source\repos\Alastowor\ebicCSGOExternal\x64\Debug\csgoExternalstuffs1.exe
