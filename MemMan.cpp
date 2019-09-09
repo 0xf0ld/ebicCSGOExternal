@@ -1,7 +1,5 @@
-#include "MemMan.h"
+#include "MemMan.hpp"
 #include <TlHelp32.h>
-#include <iostream>
-#include <iomanip>
 
 MemMan::MemMan()
 {

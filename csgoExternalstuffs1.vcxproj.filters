@@ -21,12 +21,18 @@
     <ClCompile Include="MemMan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="includes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MemMan.h">
+    <ClInclude Include="csgo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="csgo.hpp">
+    <ClInclude Include="includes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MemMan.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

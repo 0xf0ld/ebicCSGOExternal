@@ -153,11 +153,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="csgoExternalstuffs1.cpp" />
+    <ClCompile Include="includes.cpp" />
     <ClCompile Include="MemMan.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csgo.hpp" />
-    <ClInclude Include="MemMan.h" />
+    <ClInclude Include="includes.hpp" />
+    <ClInclude Include="MemMan.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
