@@ -21,7 +21,7 @@ C:\Users\Alastor\source\repos\Alastowor\ebicCSGOExternal\csgoExternalstuffs1.cpp
 C:\Users\Alastor\source\repos\Alastowor\ebicCSGOExternal\csgoExternalstuffs1.cpp(105,27): warning C4244:  '=': conversion from 'float' to 'int', possible loss of data
 E:\Microsoft Visual Studio\VC\Tools\MSVC\14.22.27905\include\xtgmath.h(22,106): warning C4244:  'return': conversion from 'double' to 'float', possible loss of data
   Generating code
-  5 of 78 functions ( 6.4%) were compiled, the rest were copied from previous compilation.
+  4 of 78 functions ( 5.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     3 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
