@@ -2,30 +2,30 @@
 #include <vector>
 #include <Windows.h>
 
+#define WIN32_LEAN_AND_MEAN
+
 class MemMan
 {
 public:
 	MemMan();
 	~MemMan();
-	template <class val>
-	val readMem(uintptr_t addr)
+	template <typename T>
+	bool readMem(uintptr_t addr, T const& val)
 	{
-		val x;
-		ReadProcessMemory(handle, (LPBYTE*)addr, &x, sizeof(x), NULL);
-		return x;
+		return !!ReadProcessMemory(PROC, reinterpret_cast<LPVOID>(address), reinterpret_cast<LPCVOID>(&val), sizeof(val), nullptr);
+		//return !!ReadProcessMemory(PROC, (LPBYTE*)addr, &x, sizeof(x), NULL);
 	}
-	template <class val>
-	val writeMem(uintptr_t addr, val x)
+	template <typename T>
+	bool writeMem(uintptr_t addr, T const& val)
 	{
-		WriteProcessMemory(handle, (LPBYTE*)addr, &x, sizeof(x), NULL);
-		return x;
+		return !!WriteProcessMemory(PROC, reinterpret_cast<LPVOID>(address), reinterpret_cast<LPCVOID>(&val), sizeof(val), nullptr);
+		//return WriteProcessMemory(handle, (LPBYTE*)addr, &x, sizeof(x), NULL);
 	}
 
 	uintptr_t getProcess(const wchar_t*);
 	uintptr_t getModule(uintptr_t, const wchar_t*);
 	uintptr_t getAddress(uintptr_t, std::vector<uintptr_t>);
-	
+
 private:
 	HANDLE handle;
-
 };
