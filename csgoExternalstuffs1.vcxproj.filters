@@ -21,7 +21,7 @@
     <ClCompile Include="MemMan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="includes.cpp">
+    <ClCompile Include="functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

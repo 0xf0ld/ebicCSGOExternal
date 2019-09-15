@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _INCLUDES_HPP_
 #define _INCLUDES_HPP_
 #include <cmath>
@@ -7,10 +8,10 @@
 #include "MemMan.hpp"
 #include "csgo.hpp"
 
-#define FL_ONGROUND (1 << 1)
-#define IN_JUMP (1 << 0)
+#define FL_ONGROUND (1 << 0) // source sdk 2013 const.h
+//#define IN_JUMP (1 << 0)
 
-extern MemMan MemClass;
+
 
 struct offsets {
 	uintptr_t localPlayer = hazedumper::signatures::dwLocalPlayer;
@@ -57,9 +58,13 @@ extern offsets offset;
 extern values val;
 extern glowStruct Glow;
 extern vector vec;
+extern MemMan MemClass;
+
+float getDistance(uintptr_t entity);
 
 bool isScoped();
 bool checkTrigger();
+
 void handleTriggerbot();
 void bunnyHop();
 void noFlash();
@@ -70,6 +75,6 @@ void setEnemyGlow(uintptr_t entity, int glowIndex);
 void setTeamGlow(uintptr_t entity, int glowIndex);
 void handleGlow();
 void fire();
-float getDistance(uintptr_t entity);
+
 
 #endif

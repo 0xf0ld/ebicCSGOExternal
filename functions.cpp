@@ -64,12 +64,9 @@ void setTriggerDelay(float distance) {
 	std::cout << val.triggerDelay << std::endl;
 }
 
-void getCurrentWeapon() {
-	int weapon = MemClass.readMem<int>(val.localPlayer + offset.activeWeapon);
-	int weaponEntity = MemClass.readMem<int>(val.gameModule + offset.entityList + ((weapon & 0xFFF) - 1) * 0x10);
-	if (weaponEntity != NULL)
-		val.currentWeaponID = MemClass.readMem<int>(weaponEntity + offset.itemDefIndex);
-}
+/*void getCurrentWeapon() {
+
+}*/
 
 float getDistance(uintptr_t entity) {
 	vector myLoc = MemClass.readMem<vector>(val.localPlayer + offset.vecOrigin);
@@ -119,15 +116,20 @@ void handleGlow() {
 }
 
 void fire() {
-	if (isBhopRunning == true || noFlashEnabled == true)
-		return;
-	std::cout << "Firing" << std::endl;
+	//if (isBhopRunning == true || noFlashEnabled == true)
+	//	return;
+	if (isTriggerbotFiring == true) {
+		std::cout << "Firing" << std::endl;
+		isTriggerbotFiring = !isTriggerbotFiring;
+		std::this_thread::sleep_for(std::chrono::milliseconds(val.triggerDelay));
+		MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 5);
+	}
 	isTriggerbotFiring = !isTriggerbotFiring;
-	Sleep(val.triggerDelay);
-	MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 5);
-	Sleep(20);
-	MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 4);
-	isTriggerbotFiring = !isTriggerbotFiring;
+
+	if (isTriggerbotFiring == false) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 4);
+	}
 }
 
 bool checkTrigger() {
@@ -138,8 +140,10 @@ bool checkTrigger() {
 		int enemyHealth = MemClass.readMem<int>(entity + offset.health);
 		if (enemyTeam != val.friendlyTeam && enemyHealth > 0) {
 			float distance = getDistance(entity);
-			std::thread getcurrentweapon(getCurrentWeapon);
-			getcurrentweapon.detach();
+			int weapon = MemClass.readMem<int>(val.localPlayer + offset.activeWeapon);
+			int weaponEntity = MemClass.readMem<int>(val.gameModule + offset.entityList + ((weapon & 0xFFF) - 1) * 0x10);
+			if (weaponEntity != NULL)
+				val.currentWeaponID = MemClass.readMem<int>(weaponEntity + offset.itemDefIndex);
 
 			setTriggerDelay(distance);
 			if (val.currentWeaponID == 40 || val.currentWeaponID == 9) // check if using scout or AWP
@@ -154,29 +158,36 @@ bool checkTrigger() {
 }
 
 void handleTriggerbot() {
-	if (isBhopRunning == true || noFlashEnabled == true)
+	/*if (isBhopRunning == true || noFlashEnabled == true)
 		return;
-	isTriggerbotHandlerRunning = !isTriggerbotHandlerRunning;
-	if (checkTrigger()) {
+	isTriggerbotHandlerRunning = !isTriggerbotHandlerRunning;*/
+	//if (checkTrigger()) {
+	std::thread triggerCheck(checkTrigger);
+	triggerCheck.detach();
+
+	if (checkTrigger() == true) {
 		std::thread fire(fire);
 		fire.detach();
 	}
-	isTriggerbotHandlerRunning = !isTriggerbotHandlerRunning;
+	//}
+	//isTriggerbotHandlerRunning = !isTriggerbotHandlerRunning;
 }
 
 void bunnyHop() {
-	if (isTriggerbotFiring == true || isTriggerbotHandlerRunning == true || noFlashEnabled == true)
+	while (isTriggerbotFiring == true) // || isTriggerbotHandlerRunning == true || noFlashEnabled == true)
 		return;
 	isBhopRunning = !isBhopRunning;
 	std::cout << "Jumping" << std::endl;
 	MemClass.writeMem<uintptr_t>(val.gameModule + offset.fJump, 6);
 	isBhopRunning = !isBhopRunning;
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
 }
 
 void noFlash() {
-	if (isTriggerbotFiring == true || isBhopRunning == true)
+	/*if (isTriggerbotFiring == true || isBhopRunning == true)
 		return;
-	noFlashEnabled = !noFlashEnabled;
+	noFlashEnabled = !noFlashEnabled;*/
 	int flashDuration = 0;
 	flashDuration = MemClass.readMem<int>(val.localPlayer + offset.flashDuration);
 	if (flashDuration > 0)
@@ -184,9 +195,9 @@ void noFlash() {
 }
 
 void alwaysRadar() {
-	if (isTriggerbotFiring == true || isBhopRunning == true || isTriggerbotHandlerRunning == true)
+	/*if (isTriggerbotFiring == true || isBhopRunning == true || isTriggerbotHandlerRunning == true)
 		return;
-	isRadarEnabled = !isRadarEnabled;
+	isRadarEnabled = !isRadarEnabled;*/
 	for (short int entityID = 0; entityID <= 64; entityID++)
 	{
 		uintptr_t entity = MemClass.readMem<uintptr_t>(val.gameModule + offset.entityList + entityID * 0x10);
@@ -194,3 +205,15 @@ void alwaysRadar() {
 			MemClass.writeMem<bool>(entity + offset.isSpotted, true);
 	}
 }
+
+
+//this might not work at the moment.
+/*void fakeLag() {
+	BYTE SendPacket = MemClass.readMem<BYTE>(val.gameModule + offset.bSendPacket);
+
+	if (SendPacket != 0) {
+		MemClass.writeMem<BYTE>(val.gameModule + offset.bSendPacket, 0);
+		Sleep(200);
+		MemClass.writeMem<BYTE>(val.gameModule + offset.bSendPacket, 1);
+	}
+}*/

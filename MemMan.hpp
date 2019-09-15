@@ -7,18 +7,18 @@ class MemMan
 public:
 	MemMan();
 	~MemMan();
-	template <class val>
-	val readMem(uintptr_t addr)
+	template <typename T>
+	T readMem(uintptr_t addr)
 	{
-		val x;
+		T x;
 		ReadProcessMemory(handle, (LPBYTE*)addr, &x, sizeof(x), NULL);
 		return x;
 	}
-	template <class val>
-	val writeMem(uintptr_t addr, val x)
+	template <typename T>
+	bool writeMem(uintptr_t addr, T const& val)
 	{
-		WriteProcessMemory(handle, (LPBYTE*)addr, &x, sizeof(x), NULL);
-		return x;
+		return WriteProcessMemory(handle, (LPBYTE*)addr, &val, sizeof(val), NULL);
+		//return val;
 	}
 
 	uintptr_t getProcess(const wchar_t*);
