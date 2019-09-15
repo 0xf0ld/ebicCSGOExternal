@@ -7,11 +7,12 @@
 #include "MemMan.hpp"
 #include "csgo.hpp"
 
-#define FL_ONGROUND (1 << 0)
-//#define IN_JUMP (1 << 0)
+#define FL_ONGROUND (1 << 1)
+#define IN_JUMP (1 << 0)
+
+extern MemMan MemClass;
 
 struct offsets {
-	uintptr_t bSendPacket = hazedumper::signatures::dwbSendPackets;
 	uintptr_t localPlayer = hazedumper::signatures::dwLocalPlayer;
 	uintptr_t fJump = hazedumper::signatures::dwForceJump;
 	uintptr_t flags = hazedumper::netvars::m_fFlags;
@@ -52,13 +53,11 @@ struct vector {
 	float x, y, z;
 };
 
-extern MemMan MemClass;
 extern offsets offset;
 extern values val;
 extern glowStruct Glow;
 extern vector vec;
 
-void fakeLag();
 bool isScoped();
 bool checkTrigger();
 void handleTriggerbot();
@@ -72,8 +71,5 @@ void setTeamGlow(uintptr_t entity, int glowIndex);
 void handleGlow();
 void fire();
 float getDistance(uintptr_t entity);
-
-//bool canFire = false;
-
 
 #endif

@@ -57,5 +57,3 @@ uintptr_t MemMan::getAddress(uintptr_t addr, std::vector<uintptr_t> vect)
 	}
 	return addr;
 }
-
-

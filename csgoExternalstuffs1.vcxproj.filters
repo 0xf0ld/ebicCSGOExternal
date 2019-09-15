@@ -18,10 +18,10 @@
     <ClCompile Include="csgoExternalstuffs1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="functions.cpp">
+    <ClCompile Include="MemMan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MemMan.cpp">
+    <ClCompile Include="includes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

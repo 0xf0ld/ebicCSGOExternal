@@ -153,7 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="csgoExternalstuffs1.cpp" />
-    <ClCompile Include="functions.cpp" />
+    <ClCompile Include="includes.cpp" />
     <ClCompile Include="MemMan.cpp" />
   </ItemGroup>
   <ItemGroup>

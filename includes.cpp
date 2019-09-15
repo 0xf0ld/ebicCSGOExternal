@@ -1,6 +1,4 @@
-#include "functions.hpp"
-//#include "MemMan.hpp"
-#include <iostream>
+#include "includes.hpp"
 
 MemMan MemClass;
 offsets offset;
@@ -8,12 +6,7 @@ vector vec;
 values val;
 glowStruct Glow;
 
-bool isBhopRunning = false;
-bool isTriggerbotHandlerRunning = false;
-bool isTriggerbotFiring = false;
-bool noFlashEnabled = false;
-bool isRadarEnabled = false;
-//bool espEnabled = false;
+bool isBhopRunning, isTriggerbotHandlerRunning, isTriggerbotFiring, noFlashEnabled, isRadarEnabled = false;
 
 glowStruct SetGlowColour(glowStruct Glow, uintptr_t entity) {
 	bool isDefusing = MemClass.readMem<bool>(entity + offset.isDefusing);
@@ -126,16 +119,15 @@ void handleGlow() {
 }
 
 void fire() {
-//	if (isBhopRunning == true || noFlashEnabled == true)
-//		return;
+	if (isBhopRunning == true || noFlashEnabled == true)
+		return;
 	std::cout << "Firing" << std::endl;
 	isTriggerbotFiring = !isTriggerbotFiring;
 	Sleep(val.triggerDelay);
-	if (isTriggerbotFiring == true)
-		MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 5);
+	MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 5);
+	Sleep(20);
+	MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 4);
 	isTriggerbotFiring = !isTriggerbotFiring;
-	if (isTriggerbotFiring == false)
-		MemClass.writeMem<int>(val.gameModule + offset.forceATTACK, 4);
 }
 
 bool checkTrigger() {
@@ -162,33 +154,29 @@ bool checkTrigger() {
 }
 
 void handleTriggerbot() {
-	//if (isBhopRunning == true)
-	//	return;
-	//else {
-		//isTriggerbotHandlerRunning = !isTriggerbotHandlerRunning;
-		if (checkTrigger()) {
-			std::thread fire(fire);
-			fire.detach();
-		}
-		//isTriggerbotHandlerRunning = !isTriggerbotHandlerRunning;
-	//}
+	if (isBhopRunning == true || noFlashEnabled == true)
+		return;
+	isTriggerbotHandlerRunning = !isTriggerbotHandlerRunning;
+	if (checkTrigger()) {
+		std::thread fire(fire);
+		fire.detach();
+	}
+	isTriggerbotHandlerRunning = !isTriggerbotHandlerRunning;
 }
 
 void bunnyHop() {
-	while (isTriggerbotFiring == true)
+	if (isTriggerbotFiring == true || isTriggerbotHandlerRunning == true || noFlashEnabled == true)
 		return;
-	 
-		isBhopRunning = !isBhopRunning;
-		std::cout << "Jumping" << std::endl;
-		MemClass.writeMem<uintptr_t>(val.gameModule + offset.fJump, 6);
-		isBhopRunning = !isBhopRunning;
-	
+	isBhopRunning = !isBhopRunning;
+	std::cout << "Jumping" << std::endl;
+	MemClass.writeMem<uintptr_t>(val.gameModule + offset.fJump, 6);
+	isBhopRunning = !isBhopRunning;
 }
 
 void noFlash() {
-//	if (isTriggerbotFiring == true || isBhopRunning == true)
-//		return;
-//	noFlashEnabled = !noFlashEnabled;
+	if (isTriggerbotFiring == true || isBhopRunning == true)
+		return;
+	noFlashEnabled = !noFlashEnabled;
 	int flashDuration = 0;
 	flashDuration = MemClass.readMem<int>(val.localPlayer + offset.flashDuration);
 	if (flashDuration > 0)
@@ -196,23 +184,13 @@ void noFlash() {
 }
 
 void alwaysRadar() {
-//	if (isTriggerbotFiring == true || isBhopRunning == true || isTriggerbotHandlerRunning == true)
-//		return;
-//	isRadarEnabled = !isRadarEnabled;
+	if (isTriggerbotFiring == true || isBhopRunning == true || isTriggerbotHandlerRunning == true)
+		return;
+	isRadarEnabled = !isRadarEnabled;
 	for (short int entityID = 0; entityID <= 64; entityID++)
 	{
 		uintptr_t entity = MemClass.readMem<uintptr_t>(val.gameModule + offset.entityList + entityID * 0x10);
 		if (entity != NULL)
 			MemClass.writeMem<bool>(entity + offset.isSpotted, true);
-	}
-}
-
-void fakeLag() {
-	BYTE SendPacket = MemClass.readMem<BYTE>(val.gameModule + offset.bSendPacket);
-
-	if (SendPacket != 0) {
-		MemClass.writeMem<BYTE>(val.gameModule + offset.bSendPacket, 0);
-		Sleep(200);
-		MemClass.writeMem<BYTE>(val.gameModule + offset.bSendPacket, 1);
 	}
 }
